@@ -30,9 +30,9 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "INSERT INTO CONDOMINIO (NOME, DT_INAUGURACAO, PROPRIETARIO, CNPJ, STS_ATIVO) VALUES ("
-                    + condominio.nome + ", " + (condominio.dataInauguracao.ToString()) + ", "
-                    + condominio.proprietario + ", " + condominio.cnpj + ", 1)";
+                query = "INSERT INTO CONDOMINIO (NOME, DT_INAUGURACAO, PROPRIETARIO, CNPJ, STS_ATIVO) VALUES ('"
+                        + condominio.nome + "', '" + (condominio.dataInauguracao.ToString()) + "', '"
+                        + condominio.proprietario + "', '" + condominio.cnpj + "', 1);";
                 return true;
             }
 
@@ -46,11 +46,11 @@ namespace Model.DAO.Especifico
         public List<Condominio> busca()
         {
             query = null;
-            List<Condominio> lstAviso = new List<Condominio>();
+            List<Condominio> lstCond = new List<Condominio>();
             try
             {
-                query = "SELECT NOME, DT_INAUGURACAO, PROPRIETARIO, CNPJ FROM CONDOMINIO WHERE STS_ATIVO = 1";
-                lstAviso.Add(setarObjeto(banco.MetodoSelect(query)));
+                query = "SELECT NOME, DT_INAUGURACAO, PROPRIETARIO, CNPJ FROM CONDOMINIO WHERE STS_ATIVO = 1;";
+                lstCond = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -58,25 +58,7 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
 
-            return lstAviso;
-        }
-
-        public int buscaNome()   //Método personalizado. NAO TEM QUE RETORNAR LISTA!
-        {
-            query = null;
-            Condominio cond = new Condominio();
-            try
-            {
-                query = "SELECT NOME FROM CONDOMINIO WHERE STS_ATIVO = 1";
-                cond = setarObjeto(banco.MetodoSelect(query));
-            }
-
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return cond.id_cond;
+            return lstCond;
         }
 
         public bool altera(Condominio condominio)
@@ -85,7 +67,7 @@ namespace Model.DAO.Especifico
             try
             {
                 query = "UPDATE CONDOMINIO SET NOME = '" + condominio.nome + "', PROPRIETARIO = '" + condominio.proprietario 
-                        + "', CNPJ = '" + condominio.cnpj + " WHERE ID_COND = " + (condominio.id_cond).ToString();
+                        + "', CNPJ = '" + condominio.cnpj + "' WHERE ID_COND = " + (condominio.id_cond).ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -102,7 +84,7 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "UPDATE CONDOMINIO SET STS_ATIVO = 0 WHERE ID_COND = " + id.ToString();
+                query = "UPDATE CONDOMINIO SET STS_ATIVO = 0 WHERE ID_COND = " + id.ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -140,38 +122,73 @@ namespace Model.DAO.Especifico
 
         //    return lstCondominio;	
         //} //Verificar...
+
+        //public int buscaNome()   //Método personalizado. NAO TEM QUE RETORNAR LISTA!
+        //{
+        //    query = null;
+        //    Condominio cond = new Condominio();
+        //    try
+        //    {
+        //        query = "SELECT NOME FROM CONDOMINIO WHERE STS_ATIVO = 1";
+        //        cond = setarObjeto(banco.MetodoSelect(query));
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //    return cond.id_cond;
+        //}
+
         #endregion
 
         #endregion
 
         #region Métodos
 
-        public Condominio setarObjeto(SqlDataReader dr)
+        public List<Condominio> setarObjeto(SqlDataReader dr)
         {
             Condominio obj = new Condominio();
-
+            List<Condominio> lstCond = new List<Condominio>();
             try
             {
-                for (int idx = 0; idx < dr.FieldCount; idx++)
+                if (dr.HasRows)
                 {
-                    dr.GetName(idx).ToString();
-
-                    switch (dr.GetName(idx).ToUpper())
+                    while (dr.Read())
                     {
-                        case "NOME":
-                            obj.nome = Convert.ToString(dr[idx]);
-                            break;
-                        case "DT_INAUGURACAO":
-                            obj.dataInauguracao = Convert.ToDateTime(dr[idx]);
-                            break;
-                        case "PROPRIETARIO":
-                            obj.proprietario = Convert.ToString(dr[idx]);
-                            break;
-                        case "CNPJ":
-                            obj.cnpj = Convert.ToString(dr[idx]);  
-                            break;
+                        obj.id_cond = Convert.ToInt32(dr["ID_COND"].ToString());
+                        obj.nome = Convert.ToString(dr["NOME_COND"].ToString());
+                        obj.proprietario = Convert.ToString(dr["PROPRIETARIO"].ToString());
+                        obj.cnpj = Convert.ToString(dr["CNPJ"].ToString());
+                        obj.dataInauguracao = Convert.ToDateTime(dr["DT_INAUGURACAO"].ToString());
+
+                        obj.endereco.id_endereco = Convert.ToInt32(dr["ID_ENDERECO"].ToString());
+
+                        lstCond.Add(obj);
                     }
                 }
+
+                //for (int idx = 0; idx < dr.FieldCount; idx++)
+                //{
+                //    dr.GetName(idx).ToString();
+
+                //    switch (dr.GetName(idx).ToUpper())
+                //    {
+                //        case "NOME":
+                //            obj.nome = Convert.ToString(dr[idx]);
+                //            break;
+                //        case "DT_INAUGURACAO":
+                //            obj.dataInauguracao = Convert.ToDateTime(dr[idx]);
+                //            break;
+                //        case "PROPRIETARIO":
+                //            obj.proprietario = Convert.ToString(dr[idx]);
+                //            break;
+                //        case "CNPJ":
+                //            obj.cnpj = Convert.ToString(dr[idx]);  
+                //            break;
+                //    }
+                //}
             }
 
             catch (Exception ex)
@@ -180,7 +197,7 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
 
-            return obj;
+            return lstCond;
         }
 
         #endregion
