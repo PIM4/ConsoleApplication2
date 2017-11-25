@@ -50,11 +50,11 @@ namespace Model.DAO.Especifico
             List<Aviso> lstAviso = new List<Aviso>();
             try
             {
-                query = "SELECT A.ID_AVISO, A.TITULO, A.DESCRICAO, A.DATA, C.NOME as [Aviso] FROM AVISO AS A " 
+                query = "SELECT A.ID_AVISO, A.TITULO, A.DESCRICAO, A.DATA, C.NOME_COND FROM AVISO AS A " 
                         + " INNER JOIN CONDOMINIO AS C ON A.ID_COND = C.ID_COND "                     
                         + " WHERE A.STS_ATIVO = 1 AND DATA BETWEEN '" + dtinicio 
                         + "' AND '" + (dtfinal).ToString() + "';";        
-                lstAviso.Add(setarObjeto(banco.MetodoSelect(query)));
+                lstAviso = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch(Exception ex)
@@ -73,8 +73,8 @@ namespace Model.DAO.Especifico
             {
                 query = "SELECT A.TITULO, A.DESCRICAO, A.DATA, C.NOME FROM AVISO AS A "
                          + " INNER JOIN CONDOMINIO AS C ON A.ID_COND = C.ID_COND "
-                         + " WHERE A.STS_ATIVO = 1 AND A.TITULO LIKE '%" + titulo + "%'";   
-                lstAviso.Add(setarObjeto(banco.MetodoSelect(query)));
+                         + " WHERE A.STS_ATIVO = 1 AND A.TITULO LIKE '%" + titulo + "%';";   
+                lstAviso = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -93,8 +93,8 @@ namespace Model.DAO.Especifico
             {
                 query = "SELECT A.TITULO, A.DESCRICAO, A.DATA, C.NOME FROM AVISO AS A "
                         + " INNER JOIN CONDOMINIO AS C ON A.ID_COND = C.ID_COND "
-                        + " WHERE A.STS_ATIVO = 1 AND C.NOME LIKE '%" + condominio + "%'";   
-                lstAviso.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + " WHERE A.STS_ATIVO = 1 AND C.NOME LIKE '%" + condominio + "%';";   
+                lstAviso = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -105,7 +105,7 @@ namespace Model.DAO.Especifico
             return lstAviso;
         }
 
-		public List<Aviso> busca()      //Tirei o parametro condominio pq se não ia ficar identico ao método buscaPorCondominio()
+		public List<Aviso> busca()
 		{
             query = null;
             List<Aviso> lstAviso = new List<Aviso>();
@@ -113,8 +113,8 @@ namespace Model.DAO.Especifico
             {
                 query = "SELECT A.TITULO, A.DESCRICAO, A.DATA, C.NOME FROM AVISO AS A "
                         + " INNER JOIN CONDOMINIO AS C ON A.ID_COND = C.ID_COND "
-                        + " WHERE A.STS_ATIVO = 1";
-                lstAviso.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + " WHERE A.STS_ATIVO = 1;";
+                lstAviso = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -129,9 +129,9 @@ namespace Model.DAO.Especifico
         {
             query = null;
             try
-            {   //Não vai alterar data do aviso. Lembrar de bloquear o campo.
+            {   
                 query = "UPDATE AVISO SET TITULO = '" + aviso.titulo + "', DESCRICAO = '" + aviso.descricao + "' WHERE ID_AVISO = " 
-                        + (aviso.id_aviso).ToString();
+                        + (aviso.id_aviso).ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -148,7 +148,7 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "UPDATE AVISO SET STS_ATIVO = 0 WHERE ID_AVISO = " + id.ToString();
+                query = "UPDATE AVISO SET STS_ATIVO = 0 WHERE ID_AVISO = " + id.ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -164,44 +164,61 @@ namespace Model.DAO.Especifico
 
         #region Métodos
 
-        public Aviso setarObjeto(SqlDataReader dr)
+        public List<Aviso> setarObjeto(SqlDataReader dr)
         {
             Aviso obj = new Aviso();
-
+            List<Aviso> lstAviso = new List<Aviso>();
             try
             {
-                for (int idx = 0; idx < dr.FieldCount; idx++)
+                if (dr.HasRows)
                 {
-                    dr.GetName(idx).ToString();
-
-                    switch (dr.GetName(idx).ToUpper())
+                    while (dr.Read())
                     {
-                        case "TITULO":
-                            obj.titulo = Convert.ToString(dr[idx]);
-                            break;
-                        case "DESCRICAO":
-                            obj.descricao = Convert.ToString(dr[idx]);
-                            break;
-                        case "DATA":
-                            obj.data = Convert.ToDateTime(dr[idx]);
-                            break;
-                        case "ID_AVISO":
-                            obj.id_aviso = Convert.ToInt32(dr[idx]);  
-                            break;
-                        case "NOME":
-                            obj.nome_cond = Convert.ToString(dr[idx]);
-                            break;
+                        obj.id_aviso = Convert.ToInt32(dr["ID_AVISO"].ToString());
+                        obj.titulo = Convert.ToString(dr["TITULO"].ToString());
+                        obj.descricao = Convert.ToString(dr["DESCRICAO"].ToString());
+                        obj.data = Convert.ToDateTime(dr["DT_AVISO"].ToString());
+
+                        obj.cond.id_cond = Convert.ToInt32(dr["ID_COND"].ToString());
+                        obj.cond.nome = Convert.ToString(dr["NOME_COND"].ToString());
+
+                        lstAviso.Add(obj);
                     }
                 }
-            }
+                    //for (int idx = 0; idx < dr.FieldCount; idx++)
+                    //{
+                    //    dr.GetName(idx).ToString();
 
+                    //    switch (dr.GetName(idx).ToUpper())
+                    //    {
+                    //        case "TITULO":
+                    //            obj.titulo = Convert.ToString(dr[idx]);
+                    //            break;
+                    //        case "DESCRICAO":
+                    //            obj.descricao = Convert.ToString(dr[idx]);
+                    //            break;
+                    //        case "DATA":
+                    //            obj.data = Convert.ToDateTime(dr[idx]);
+                    //            break;
+                    //        case "ID_AVISO":
+                    //            obj.id_aviso = Convert.ToInt32(dr[idx]);  
+                    //            break;
+                    //        case "NOME_COND":
+                    //            obj.cond.nome = Convert.ToString(dr[idx]);
+                    //            break;
+                    //        case "ID_COND":
+                    //            obj.cond.id_cond = Convert.ToInt32(dr[idx]);
+                    //            break;
+                    //    }
+                    //}
+            }
             catch (Exception ex)
             {
                 dr.Dispose();
                 throw ex;
             }
 
-            return obj;
+            return lstAviso;
         }
 
         #endregion

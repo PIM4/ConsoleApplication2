@@ -18,10 +18,6 @@ namespace Model.Entity
 
         public Condominio cond { get; set; }
 
-        //public int id_cond { get; set; }
-
-        //public string nome_cond { get; set; }
-
 		public DateTime data { get; set; }
 
         public Aviso(string titulo, string descricao, Condominio condominio)

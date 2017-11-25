@@ -9,7 +9,63 @@ using System.Data.SqlClient;
 
 namespace Model.DAO.Especifico
 {
-	public class AreaDAO
+	public class AreaDAO        #region Métodos
+
+        public List<Area> setarObjeto(SqlDataReader dr)
+        {
+            Area obj = new Area();
+            List<Area> lstArea = new List<Area>();
+            try
+            {
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        obj.id_area = Convert.ToInt32(dr["ID_AREA"].ToString());
+                        obj.descricao = Convert.ToString(dr["DESCRICAO"].ToString());
+                        obj.seAluga = Convert.ToBoolean(dr["RESERVA"].ToString());
+                        obj.nome = Convert.ToString(dr["NOME"].ToString());
+                        obj.capacMax = Convert.ToInt32(dr["CAPACIDADE_MAX"].ToString());
+                        lstArea.Add(obj);
+                    }
+                }
+
+                //for (int idx = 0; idx < dr.FieldCount; idx++)
+                //{
+                    //dr.GetName(idx).ToString();
+
+                    //switch (dr.GetName(idx).ToUpper())
+                    //{
+                    //    case "ID_AREA":
+                    //        obj.id_area = Convert.ToInt32(dr[idx]);
+                    //        break;
+                    //    case "DESCRICAO":
+                    //        obj.descricao = Convert.ToString(dr[idx]);
+                    //        break;
+                    //    case "RESERVA":
+                    //        obj.seAluga = Convert.ToBoolean(dr[idx]);
+                    //        break;
+                    //    case "NOME":
+                    //        obj.nome = Convert.ToString(dr[idx]);
+                    //        break;
+                    //    case "CAPACIDADE_MAX":
+                    //        obj.capacMax = Convert.ToInt32(dr[idx]);
+                    //        break;
+                    //}
+                //}
+            }
+
+            catch(Exception ex)
+            {
+                dr.Dispose();
+                throw ex;
+            }
+
+            return lstArea;
+        }
+
+        #endregion
+
     {
         #region Observações
         
@@ -146,62 +202,6 @@ namespace Model.DAO.Especifico
         
         #endregion
 
-        #region Métodos
-
-        public List<Area> setarObjeto(SqlDataReader dr)
-        {
-            Area obj = new Area();
-            List<Area> lstArea = new List<Area>();
-            try
-            {
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        obj.id_area = Convert.ToInt32(dr["ID_AREA"].ToString());
-                        obj.descricao = Convert.ToString(dr["DESCRICAO"].ToString());
-                        obj.seAluga = Convert.ToBoolean(dr["RESERVA"].ToString());
-                        obj.nome = Convert.ToString(dr["NOME"].ToString());
-                        obj.capacMax = Convert.ToInt32(dr["CAPACIDADE_MAX"].ToString());
-                        lstArea.Add(obj);
-                    }
-                }
-
-                //for (int idx = 0; idx < dr.FieldCount; idx++)
-                //{
-                    //dr.GetName(idx).ToString();
-
-                    //switch (dr.GetName(idx).ToUpper())
-                    //{
-                    //    case "ID_AREA":
-                    //        obj.id_area = Convert.ToInt32(dr[idx]);
-                    //        break;
-                    //    case "DESCRICAO":
-                    //        obj.descricao = Convert.ToString(dr[idx]);
-                    //        break;
-                    //    case "RESERVA":
-                    //        obj.seAluga = Convert.ToBoolean(dr[idx]);
-                    //        break;
-                    //    case "NOME":
-                    //        obj.nome = Convert.ToString(dr[idx]);
-                    //        break;
-                    //    case "CAPACIDADE_MAX":
-                    //        obj.capacMax = Convert.ToInt32(dr[idx]);
-                    //        break;
-                    //}
-                //}
-            }
-
-            catch(Exception ex)
-            {
-                dr.Dispose();
-                throw ex;
-            }
-
-            return lstArea;
-        }
-
-        #endregion
     }
 }
 

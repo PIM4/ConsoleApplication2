@@ -14,6 +14,7 @@ namespace Model.Entity
         {
 
         }
+
         public int id_area { get; set; }
 
 		public string nome { get; set; }
@@ -23,8 +24,6 @@ namespace Model.Entity
 		public int capacMax { get ;set; }
 
 		public bool seAluga { get; set; }
-
-        //public bool ativo { get; set; }
 		
 	}
 
