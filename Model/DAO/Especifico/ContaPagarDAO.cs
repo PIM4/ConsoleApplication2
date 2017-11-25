@@ -8,8 +8,6 @@ namespace Model.DAO.Especifico
 {
 	public class ContaPagarDAO
     {
-        #region CONTAS A PAGAR
-
         #region Observações
 
         //Por padrão, todas as buscas serão WHERE STS_ATIVO = 1, exceto a verificação se já existe o cadastro.
@@ -23,6 +21,8 @@ namespace Model.DAO.Especifico
         string query = null;
 
         #endregion
+
+        #region CONTAS A PAGAR
 
         #region CRUD
 
@@ -154,23 +154,23 @@ namespace Model.DAO.Especifico
             return lstContaPagar;
         }
 
-        public List<ContaPagar> buscaTipoConta()
-        {
-            query = null;
-            List<ContaPagar> lstContaPagar = new List<ContaPagar>();
-            try
-            {
-                query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE STS_ATIVO = 1;";
-                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
-            }
+        //public List<ContaPagar> buscaTipoConta()
+        //{
+        //    query = null;
+        //    List<ContaPagar> lstContaPagar = new List<ContaPagar>();
+        //    try
+        //    {
+        //        query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE STS_ATIVO = 1;";
+        //        lstContaPagar = setarObjeto(banco.MetodoSelect(query));
+        //    }
 
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
 
-            return lstContaPagar;
-        }
+        //    return lstContaPagar;
+        //}
 
         public bool altera(ContaPagar cp)
         {
@@ -206,6 +206,53 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
         }
+
+        #endregion
+
+        #endregion
+
+        #region TIPO DE CONTA
+
+        #region CRUD
+
+        public List<ContaPagar> buscaTipoPorDescricao(ContaPagar tipo)
+        {
+            query = null;
+            List<ContaPagar> lstTipos = new List<ContaPagar>();
+            try
+            {
+                query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE DESCRICAO LIKE '%" + tipo.desc_conta + "%' "
+                        + " AND STS_ATIVO = 1;";
+                lstTipos = setarObjeto(banco.MetodoSelect(query));
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstTipos;
+        }
+
+        public List<ContaPagar> buscaTipo()
+        {
+            query = null;
+            List<ContaPagar> lstTipos = new List<ContaPagar>();
+            try
+            {
+                query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE STS_ATIVO = 1;";
+                lstTipos = setarObjeto(banco.MetodoSelect(query));
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstTipos;
+        }
+
+        #endregion
 
         #endregion
 
@@ -273,49 +320,6 @@ namespace Model.DAO.Especifico
             }
 
             return lstCP;
-        }
-
-        #endregion
-
-        #endregion
-
-        #region TIPO DE CONTA
-
-        public List<ContaPagar> buscaTipoPorDescricao(ContaPagar tipo)
-        {
-            query = null;
-            List<ContaPagar> lstTipos = new List<ContaPagar>();
-            try
-            {
-                query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE DESCRICAO LIKE '%" + tipo.desc_conta + "%' "
-                        + " AND STS_ATIVO = 1";
-                lstTipos.Add(setarObjeto(banco.MetodoSelect(query)));
-            }
-
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return lstTipos;
-        }
-
-        public List<ContaPagar> buscaTipo()
-        {
-            query = null;
-            List<ContaPagar> lstTipos = new List<ContaPagar>();
-            try
-            {
-                query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE STS_ATIVO = 1";
-                lstTipos.Add(setarObjeto(banco.MetodoSelect(query)));
-            }
-
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return lstTipos;
         }
 
         #endregion
