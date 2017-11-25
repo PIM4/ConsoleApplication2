@@ -9,7 +9,9 @@ using System.Data.SqlClient;
 
 namespace Model.DAO.Especifico
 {
-	public class AreaDAO        #region Métodos
+	public class AreaDAO        
+    {
+        #region Métodos
 
         public List<Area> setarObjeto(SqlDataReader dr)
         {
@@ -66,7 +68,6 @@ namespace Model.DAO.Especifico
 
         #endregion
 
-    {
         #region Observações
         
         //Por padrão, todas as buscas serão WHERE STS_ATIVO = 1, exceto a verificação se já existe o cadastro.

@@ -33,7 +33,7 @@ namespace Model.DAO.Especifico
             {
                 query = "INSERT INTO CONTA_PAGAR (VALOR, DT_PAGTO, ID_TIPO_CONTA, ID_FORNECEDOR, ID_COND, STS_ATIVO) VALUES ("
                         + (cp.valor).ToString() + ", '" + (cp.data).ToShortDateString() + "', " + (cp.id_tipo).ToString()
-                        + ", " + (cp.fornecedor.id_fornecedor).ToString() + ", " + (cp.condominio.id_cond).ToString() + ", 1)";
+                        + ", " + (cp.fornecedor.id_fornecedor).ToString() + ", " + (cp.condominio.id_cond).ToString() + ", 1);";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -55,8 +55,8 @@ namespace Model.DAO.Especifico
                         + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
                         + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
                         + "WHERE DT_PAGTO BETWEEN '" + (dt1).ToShortDateString() + "' AND '" + (dt2).ToShortDateString()
-                        + "AND CP.STS_ATIVO = 1";
-                lstContaPagar.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + "' AND CP.STS_ATIVO = 1;";
+                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -77,8 +77,8 @@ namespace Model.DAO.Especifico
                         + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
                         + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
                         + "WHERE VALOR BETWEEN '" + (val1).ToString() + "' AND '" + (val2).ToString() + "' " 
-                        + "AND CP.STS_ATIVO = 1";
-                lstContaPagar.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + "AND CP.STS_ATIVO = 1;";
+                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -91,8 +91,6 @@ namespace Model.DAO.Especifico
 
         public List<ContaPagar> buscaPorTipo(int tipo)
         {
-            //A ideia no form seria primeiro uma mini busca dos tipos que ja existem, depois de preenchido essa string
-            //é preenchida com o id do tipo que a pessoa escolheu...
             query = null;
             List<ContaPagar> lstContaPagar = new List<ContaPagar>();
             try
@@ -100,8 +98,8 @@ namespace Model.DAO.Especifico
                 query = "SELECT TC.DESCRICAO, F.RAZAO_SOCIAL, CP.VALOR, CP.DT_PAGTO FROM CONTA_PAGAR AS CP "
                         + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
                         + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
-                        + "WHERE CP.STS_ATIVO = 1 AND CP.TIPO = " + (tipo).ToString();
-                lstContaPagar.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + "WHERE CP.STS_ATIVO = 1 AND CP.TIPO = " + (tipo).ToString() + ";";
+                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -144,8 +142,26 @@ namespace Model.DAO.Especifico
                 query = "SELECT TC.DESCRICAO, F.RAZAO_SOCIAL, CP.VALOR, CP.DT_PAGTO FROM CONTA_PAGAR AS CP "
                         + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
                         + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
-                        + "WHERE CP.STS_ATIVO = 1";
-                lstContaPagar.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + "WHERE CP.STS_ATIVO = 1;";
+                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstContaPagar;
+        }
+
+        public List<ContaPagar> buscaTipoConta()
+        {
+            query = null;
+            List<ContaPagar> lstContaPagar = new List<ContaPagar>();
+            try
+            {
+                query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE STS_ATIVO = 1;";
+                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -161,8 +177,8 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "UPDATE CONTA_PAGAR SET VALOR = " + (cp.valor).ToString() + ", DT_PAGTO = " + (cp.data).ToShortDateString()
-                        + ", ID_TIPO_CONTA = " + (cp.id_tipo).ToString() + ", ID_COND = " + (cp.condominio.id_cond).ToString();
+                query = "UPDATE CONTA_PAGAR SET VALOR = " + (cp.valor).ToString() + ", DT_PAGTO = '" + (cp.data).ToShortDateString()
+                        + "', ID_TIPO_CONTA = " + (cp.id_tipo).ToString() + ", ID_COND = " + (cp.condominio.id_cond).ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -179,7 +195,7 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "UPDATE CONTA_PAGAR SET STS_ATIVO = 0 WHERE ID_CONTA_PAGAR = " + id.ToString();
+                query = "UPDATE CONTA_PAGAR SET STS_ATIVO = 0 WHERE ID_CONTA_PAGAR = " + id.ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -195,38 +211,59 @@ namespace Model.DAO.Especifico
 
         #region Métodos
 
-        public ContaPagar setarObjeto(SqlDataReader dr)
+        public List<ContaPagar> setarObjeto(SqlDataReader dr)
         {
             ContaPagar obj = new ContaPagar();
+            List<ContaPagar> lstCP = new List<ContaPagar>();
 
             try
             {
-                for (int idx = 0; idx < dr.FieldCount; idx++)
+                if (dr.HasRows)
                 {
-                    dr.GetName(idx).ToString();
-
-                    switch (dr.GetName(idx).ToUpper())
+                    while (dr.Read())
                     {
-                        case "DESCRICAO":
-                            obj.desc_conta = Convert.ToString(dr[idx]);
-                            break;
-                        case "RAZAO_SOCIAL":
-                            obj.fornecedor.nomeEmpresa = Convert.ToString(dr[idx]);
-                            break;
-                        case "VALOR":
-                            obj.valor = Convert.ToDecimal(dr[idx]);
-                            break;
-                        case "DT_PAGTO":
-                            obj.data = Convert.ToDateTime(dr[idx]);
-                            break;
-                        case "ID_FORNECEDOR":
-                            obj.fornecedor.id_fornecedor = Convert.ToInt32(dr[idx]);
-                            break;
-                        case "ID_TIPO_CONTA":
-                            obj.id_tipo = Convert.ToInt32(dr[idx]);
-                            break;
+                        obj.id_cp = Convert.ToInt32(dr["ID_CONTA_PAGAR"].ToString());
+                        obj.valor = Convert.ToDecimal(dr["VALOR"].ToString());
+                        obj.data = Convert.ToDateTime(dr["DT_PAGTO"].ToString());
+
+                        obj.id_tipo = Convert.ToInt32(dr["ID_TIPO_CONTA"].ToString());
+                        obj.desc_conta = Convert.ToString(dr["DESCRICAO"].ToString());
+
+                        obj.fornecedor.id_fornecedor = Convert.ToInt32(dr["ID_FORNECEDOR"].ToString());
+                        obj.fornecedor.nomeEmpresa = Convert.ToString(dr["RAZAO_SOCIAL"].ToString());
+
+                        obj.condominio.id_cond = Convert.ToInt32(dr["ID_COND"].ToString());
+
+                        lstCP.Add(obj);
                     }
                 }
+
+                //for (int idx = 0; idx < dr.FieldCount; idx++)
+                //{
+                //    dr.GetName(idx).ToString();
+
+                //    switch (dr.GetName(idx).ToUpper())
+                //    {
+                //        case "DESCRICAO":
+                //            obj.desc_conta = Convert.ToString(dr[idx]);
+                //            break;
+                //        case "RAZAO_SOCIAL":
+                //            obj.fornecedor.nomeEmpresa = Convert.ToString(dr[idx]);
+                //            break;
+                //        case "VALOR":
+                //            obj.valor = Convert.ToDecimal(dr[idx]);
+                //            break;
+                //        case "DT_PAGTO":
+                //            obj.data = Convert.ToDateTime(dr[idx]);
+                //            break;
+                //        case "ID_FORNECEDOR":
+                //            obj.fornecedor.id_fornecedor = Convert.ToInt32(dr[idx]);
+                //            break;
+                //        case "ID_TIPO_CONTA":
+                //            obj.id_tipo = Convert.ToInt32(dr[idx]);
+                //            break;
+                //    }
+                //}
             }
 
             catch (Exception ex)
@@ -235,7 +272,7 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
 
-            return obj;
+            return lstCP;
         }
 
         #endregion
