@@ -110,28 +110,26 @@ namespace Model.DAO.Especifico
             return lstContaPagar;
         }
 
-        //VERIFICAR COM CARLOS!
-        //public List<ContaPagar> buscaPorNomeFornecedor(Fornecedor fornecedor)
-        //{
-        //    query = null;
-        //    List<ContaPagar> lstContaPagar = new List<ContaPagar>();
-        //    try
-        //    {
-        //        query = "SELECT TC.DESCRICAO, F.RAZAO_SOCIAL, CP.VALOR, CP.DT_PAGTO FROM CONTA_PAGAR AS CP "
-        //                + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
-        //                + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
-        //                + "WHERE F.RAZAO_SOCIAL "
-        //                + "AND CP.STS_ATIVO = 1";
-        //        lstContaPagar.Add(setarObjeto(banco.MetodoSelect(query)));
-        //    }
+        public List<ContaPagar> buscaPorFornecedor(Fornecedor fornecedor)
+        {
+            query = null;
+            List<ContaPagar> lstContaPagar = new List<ContaPagar>();
+            try
+            {
+                query = "SELECT F.RAZAO_SOCIAL, CP.DT_PAGTO, CP.VALOR, TC.DESCRICAO FROM CONTA_PAGAR AS CP "
+                        + "INNER JOIN FORNECEDOR AS F ON F.ID_FORNECEDOR = CP.ID_FORNECEDOR "
+                        + "INNER JOIN TIPO_CONTA AS TC ON TC.ID_TIPO_CONTA = CP.ID_TIPO_CONTA "
+                        + "WHERE F.RAZAO_SOCIAL LIKE '%" + fornecedor.nomeEmpresa + "%';";
+                lstContaPagar = setarObjeto(banco.MetodoSelect(query));
+            }
 
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
-        //    return lstContaPagar;
-        //}
+            return lstContaPagar;
+        }
 
 		public List<ContaPagar> buscaContaPagar()
 		{
@@ -153,24 +151,6 @@ namespace Model.DAO.Especifico
 
             return lstContaPagar;
         }
-
-        //public List<ContaPagar> buscaTipoConta()
-        //{
-        //    query = null;
-        //    List<ContaPagar> lstContaPagar = new List<ContaPagar>();
-        //    try
-        //    {
-        //        query = "SELECT DESCRICAO FROM TIPO_CONTA WHERE STS_ATIVO = 1;";
-        //        lstContaPagar = setarObjeto(banco.MetodoSelect(query));
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-
-        //    return lstContaPagar;
-        //}
 
         public bool altera(ContaPagar cp)
         {

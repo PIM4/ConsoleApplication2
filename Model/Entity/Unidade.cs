@@ -5,6 +5,7 @@ namespace Model.Entity
 {
 	public class Unidade
 	{
+        public int id_unidade { get; set; }
 		public string identificacao{get;set;}
 		public Proprietario proprietario{get;set;}
 		public Bloco bloco{get;set;}
