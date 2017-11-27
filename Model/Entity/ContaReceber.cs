@@ -5,16 +5,28 @@ namespace Model.Entity
 {
 	public class ContaReceber
 	{
-		public Condominio condominio{get;set;}
-		public Unidade unidade{get;set;}
-		public DateTime data{get;set;}
-		public string observacao{set;get;}
-		public float valor{get;set;}
+        public ContaReceber()
+        {
 
-		public ContaReceber(Condominio condominio, float valor, Unidade uni, float valor)
-		{
+        }
 
-		}
+        public ContaReceber(Condominio condominio, float valor, Unidade uni)
+        {
+
+        }
+
+        public int id_cr { get; set; }
+
+        public string observacao { set; get; }
+
+        public float valor { get; set; }
+
+        public DateTime data { get; set; }
+
+		public Condominio condominio{ get; set; }
+
+		public Unidade unidade{ get; set; }
+
 	}
 
 }
