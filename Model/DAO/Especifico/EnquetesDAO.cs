@@ -24,7 +24,7 @@ namespace Model.DAO.Especifico
 
         #region CRUD
 
-        public bool cadastraEnquete(Enquete enquete)
+        public bool cadastra(Enquete enquete)
 		{
             query = null;
             try
@@ -32,7 +32,7 @@ namespace Model.DAO.Especifico
                 query = "INSERT INTO ENQUETE (PERGUNTA, DT_INICIO, DT_FINAL, ID_COND, STS_ATIVO) VALUES ('"
                         + enquete.pergunta + "', '" + (enquete.dtInicio).ToShortDateString() + "', "
                         + (enquete.dtFim).ToShortDateString() + "', " + (enquete.condominio.id_cond).ToString()
-                        + ", 1";
+                        + ", 1;";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -44,13 +44,13 @@ namespace Model.DAO.Especifico
             }	
         }
 
-        public bool cadastraEnqueteAlternativas(Enquete enquete)
+        public bool cadastraAlternativas(Enquete enquete)
         {
             query = null;
             try
             {
                 query = "INSERT INTO ENQUETE_ALTERNATIVAS (TEXTO, ID_ENQUETE, STS_ATIVO) VALUES ('"
-                        + enquete.textoAlt + "', " + (enquete.id_enquete).ToString() + ", 1";
+                        + enquete.textoAlt + "', " + (enquete.id_enquete).ToString() + ", 1;";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -69,7 +69,7 @@ namespace Model.DAO.Especifico
             {
                 query = "INSERT INTO VOTO (ID_ENQUETE, ID_ENQUETE_ALTERNATIVAS, ID_PESSOA, STS_ATIVO) VALUES ("
                         + (enquete.id_enquete).ToString() + ", " + (enquete.voto).ToString() + ", "
-                        + (enquete.pessoa.id_pessoa).ToString() + ", 1)";
+                        + (enquete.pessoa.id_pessoa).ToString() + ", 1);";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -90,8 +90,8 @@ namespace Model.DAO.Especifico
                 query = "SELECT E.PERGUNTA, E.DT_INICIO, E.DT_FINAL, C.CONDOMINIO FROM ENQUETE AS E"
                         + " INNER JOIN CONDOMINIO AS C ON E.ID_COND = C.ID_COND"
                         + " WHERE E.STS_ATIVO = 1 AND E.DT_INICIO = '" + (dtInicio).ToShortDateString()
-                        + "' AND E.DT_FINAL = '" + (dtFinal).ToShortDateString() + "'";
-                lstEnquete.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + "' AND E.DT_FINAL = '" + (dtFinal).ToShortDateString() + "';";
+                lstEnquete = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -110,8 +110,8 @@ namespace Model.DAO.Especifico
             {
                 query = "SELECT E.PERGUNTA, E.DT_INICIO, E.DT_FINAL, C.CONDOMINIO FROM ENQUETE AS E"
                         + " INNER JOIN CONDOMINIO AS C ON E.ID_COND = C.ID_COND"
-                        + " WHERE E.STS_ATIVO = 1";
-                lstEnquete.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + " WHERE E.STS_ATIVO = 1;";
+                lstEnquete = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -122,15 +122,15 @@ namespace Model.DAO.Especifico
             return lstEnquete;
         }
 
-        public List<Enquete> buscaEnqueteAlt(int id)
+        public List<Enquete> buscaAlternativas(int id)
         {
             query = null;
             List<Enquete> lstEnqueteAlt = new List<Enquete>();
             try
             {
                 query = "SELECT TEXTO FROM ENQUETE_ALTERNATIVAS WHERE STS_ATIVO = 1 AND ID_ENQUETE = " 
-                        + (id).ToString();
-                lstEnqueteAlt.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + (id).ToString() + ";";
+                lstEnqueteAlt = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -141,6 +141,24 @@ namespace Model.DAO.Especifico
             return lstEnqueteAlt;
         }
 
+        public List<Enquete> buscaVotosPorEnquete(int id)   //Verificar
+        {
+            query = null;
+            List<Enquete> lstVoto = new List<Enquete>();
+            try
+            {
+                query = "SELECT ";
+                lstVoto = setarObjeto(banco.MetodoSelect(query));
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstVoto;
+        }
+
         public bool alteraEnquete(Enquete enquete)
         {
             query = null;
@@ -148,7 +166,7 @@ namespace Model.DAO.Especifico
             {
                 query = "UPDATE ENQUETE SET DT_FINAL = '"
                         + (enquete.dtFim).ToShortDateString() + "' WHERE ID_ENQUETE = " 
-                        + (enquete.id_enquete).ToString();
+                        + (enquete.id_enquete).ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -166,7 +184,7 @@ namespace Model.DAO.Especifico
             try
             {
                 query = "UPDATE ENQUETE SET STS_ATIVO = 0 WHERE ID_ENQUETE = "
-                        + (id).ToString();
+                        + (id).ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -184,7 +202,7 @@ namespace Model.DAO.Especifico
             try
             {
                 query = "UPDATE ENQUETE_ALTERNATIVAS SET STS_ATIVO = 0 WHERE ID_ENQUETE_ALTERNATIVAS = "
-                        + (id).ToString();
+                        + (id).ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -200,10 +218,10 @@ namespace Model.DAO.Especifico
 
         #region Métodos
 
-        public Enquete setarObjeto(SqlDataReader dr)
+        public List<Enquete> setarObjeto(SqlDataReader dr)
         {
             Enquete obj = new Enquete();
-
+            List<Enquete> lstEnquete = new List<Enquete>();
             try
             {
                 for (int idx = 0; idx < dr.FieldCount; idx++)
@@ -249,7 +267,7 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
 
-            return obj;
+            return lstEnquete;
         }
 
         #endregion

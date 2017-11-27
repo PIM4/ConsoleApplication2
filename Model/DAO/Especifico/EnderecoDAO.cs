@@ -31,9 +31,9 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "INSERT INTO ENDERECO (LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP, ID_PESSOA, STS_ATIVO, DESCRICAO) VALUES ("
-                    + end.logradouro + ", " + (end.numero).ToString() + ", " + end.complemento + ", " + end.bairro + ", " + end.cidade + ", " 
-                    + end.estado + ", " + end.cep + ", " + (end.id_pessoa).ToString() + ", " + ", 1, " + end.descricao + ")";
+                query = "INSERT INTO ENDERECO (LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP, ID_PESSOA, STS_ATIVO, DESCRICAO) VALUES ('"
+                    + end.logradouro + "', " + (end.numero).ToString() + ", '" + end.complemento + "', '" + end.bairro + "', '" + end.cidade + "', '" 
+                    + end.estado + "', '" + end.cep + "', " + (end.id_pessoa).ToString() + ", " + ", 1, '" + end.descricao + "';)";
                 return true;
             }
 
@@ -51,8 +51,8 @@ namespace Model.DAO.Especifico
             try
             {
                 query = "SELECT DESCRICAO, LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP FROM ENDERECO WHERE STS_ATIVO = 1 AND LOGRADOURO LIKE '%" 
-                    + logradouro + "%'";
-                lstEndereco.Add(setarObjeto(banco.MetodoSelect(query)));
+                    + logradouro + "%';";
+                lstEndereco = setarObjeto(banco.MetodoSelect(query));
             }
                          
             catch (Exception ex)
@@ -63,15 +63,15 @@ namespace Model.DAO.Especifico
             return lstEndereco;	
         }
 
-        public List<Endereco> buscarEnderecoPorCep(string cep, int id_pessoa)
+        public List<Endereco> buscaPorCep(string cep, int id_pessoa)
 		{
             query = null;
             List<Endereco> lstEndereco = new List<Endereco>();
             try
             {
                 query = "SELECT DESCRICAO, LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP FROM ENDERECO WHERE STS_ATIVO = 1 AND CEP = "
-                    + cep;
-                lstEndereco.Add(setarObjeto(banco.MetodoSelect(query)));
+                    + cep + ";";
+                lstEndereco = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -82,15 +82,15 @@ namespace Model.DAO.Especifico
             return lstEndereco;	
         }
 
-        public List<Endereco> buscarEnderecoPorEstado(string estado, int id_pessoa)
+        public List<Endereco> buscaPorEstado(string estado, int id_pessoa)
 		{
             query = null;
             List<Endereco> lstEndereco = new List<Endereco>();
             try
             {
                 query = "SELECT DESCRICAO, LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP FROM ENDERECO WHERE STS_ATIVO = 1 AND ESTADO = "
-                    + estado;
-                lstEndereco.Add(setarObjeto(banco.MetodoSelect(query)));
+                    + estado + ";";
+                lstEndereco = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -101,15 +101,15 @@ namespace Model.DAO.Especifico
             return lstEndereco;	
         }
 
-        public List<Endereco> buscarEnderecoPorCidade(string cidade, int id_pessoa)
+        public List<Endereco> buscaPorCidade(string cidade, int id_pessoa)
 		{
             query = null;
             List<Endereco> lstEndereco = new List<Endereco>();
             try
             {
                 query = "SELECT DESCRICAO, LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP FROM ENDERECO WHERE STS_ATIVO = 1 AND CIDADE ="
-                    + cidade;
-                lstEndereco.Add(setarObjeto(banco.MetodoSelect(query)));
+                    + cidade + ";";
+                lstEndereco = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -120,14 +120,14 @@ namespace Model.DAO.Especifico
             return lstEndereco;	
         }
 
-		public List<Endereco> listaEndereco(int id_pessoa)
+		public List<Endereco> busca(int id_pessoa)
 		{
             query = null;
             List<Endereco> lstEndereco = new List<Endereco>();
             try
             {
-                query = "SELECT DESCRICAO, LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP FROM ENDERECO WHERE STS_ATIVO = 1";
-                lstEndereco.Add(setarObjeto(banco.MetodoSelect(query)));
+                query = "SELECT DESCRICAO, LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, ESTADO, CEP FROM ENDERECO WHERE STS_ATIVO = 1;";
+                lstEndereco = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -136,6 +136,26 @@ namespace Model.DAO.Especifico
             }
 
             return lstEndereco;	
+        }
+
+        public bool altera(Endereco endereco)
+        {
+            query = null;
+            try
+            {
+                query = "UPDATE CORRESPONDENCIA SET LOGRADOURO = '" + endereco.logradouro + "', NUMERO = " + endereco.numero.ToString()
+                        + ", COMPLEMENTO = '" + endereco.complemento + "', BAIRRO = '" + endereco.bairro + "', CIDADE = '" + endereco.cidade
+                        + "', ESTADO = '" + endereco.estado + "', CEP = '" + endereco.cep + "', DESCRICAO = '" + endereco.descricao + "' "
+                        + " WHERE ID_ENDERECO = " + endereco.id_endereco.ToString() + ";";
+                banco.MetodoNaoQuery(query);
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                return false;
+                throw ex;
+            }
         }
 
 		public bool remove(int id)
@@ -143,7 +163,7 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "UPDATE ENDERECO SET STS_ATIVO = 0 WHERE ID_ENDERECO = " + id.ToString();
+                query = "UPDATE ENDERECO SET STS_ATIVO = 0 WHERE ID_ENDERECO = " + id.ToString() + ";";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -159,10 +179,10 @@ namespace Model.DAO.Especifico
 
         #region Métodos
 
-        public Endereco setarObjeto(SqlDataReader dr)
+        public List<Endereco> setarObjeto(SqlDataReader dr)
         {
             Endereco obj = new Endereco();
-            
+            List<Endereco> lstEndereco = new List<Endereco>();
             try
             {
                 for (int idx = 0; idx < dr.FieldCount; idx++)
@@ -208,7 +228,7 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
 
-            return obj;
+            return lstEndereco;
         }
 
         #endregion
