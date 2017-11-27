@@ -26,7 +26,7 @@ namespace Model.DAO.Especifico
         #region CRUD
 
         public bool cadastra(ContaReceber cr)
-		{
+		{//verificar no banco se existe o campo OBSERVACAO. Se nao, adicionar.
             query = null;
             try
             {
@@ -50,10 +50,9 @@ namespace Model.DAO.Especifico
             List<ContaReceber> lstCR = new List<ContaReceber>();
             try
             {
-                query = "SELECT TC.DESCRICAO, F.RAZAO_SOCIAL, CP.VALOR, CP.DT_PAGTO FROM CONTA_PAGAR AS CP "
-                        + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
-                        + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
-                        + "WHERE CP.VALOR BETWEEN " + v1.ToString() + " AND " + v2.ToString() + " AND CP.STS_ATIVO = 1;";
+                query = "SELECT U.IDENTIFICACAO, CR.DT_CONTA_RECEBER, CR.VALOR FROM CONTA_RECEBER AS CR "
+                        + "INNER JOIN UNIDADE AS U ON U.ID_UNIDADE = CR.ID_UNIDADE "
+                        + "WHERE CR.VALOR BETWEEN " + v1.ToString() + " AND " + v2.ToString() + " AND CR.STS_ATIVO = 1 ORDER BY CR.DT_PAGTO DESC;";
                 lstCR = setarObjeto(banco.MetodoSelect(query));
             }
 
@@ -67,32 +66,113 @@ namespace Model.DAO.Especifico
 
 		public List<ContaReceber> buscaPorData(DateTime dt1, DateTime dt2)
 		{
-	return	}		
+            query = null;
+            List<ContaReceber> lstCR = new List<ContaReceber>();
+            try
+            {
+                query = "SELECT U.IDENTIFICACAO, CR.DT_CONTA_RECEBER, CR.VALOR FROM CONTA_RECEBER AS CR "
+                        + "INNER JOIN UNIDADE AS U ON U.ID_UNIDADE = CR.ID_UNIDADE "
+                        + "WHERE CR.DT_CONTA_RECEBER BETWEEN " + dt1.ToShortDateString() + " AND " + dt2.ToShortDateString() + " AND CR.STS_ATIVO = 1 ORDER BY CP.DT_CONTA_RECEBER DESC;";
+                lstCR = setarObjeto(banco.MetodoSelect(query));
+            }
 
-		public List<ContaReceber> buscaPorCondominio(Condominio condominio)
-		{
-	return	}		
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstCR;
+        }		
 
 		public List<ContaReceber> buscaPorUnidade(Unidade unidade)
 		{
-	return	}
+            query = null;
+            List<ContaReceber> lstCR = new List<ContaReceber>();
+            try
+            {
+                query = "SELECT U.IDENTIFICACAO, CR.DT_CONTA_RECEBER, CR.VALOR FROM CONTA_RECEBER AS CR "
+                        + "INNER JOIN UNIDADE AS U ON U.ID_UNIDADE = CR.ID_UNIDADE "
+                        + "WHERE CR.ID_UNIDADE = " + unidade.id_unidade.ToString() + " AND CR.STS_ATIVO = 1 ORDER BY CR.DT_CONTA_RECEBER DESC;";
+                lstCR = setarObjeto(banco.MetodoSelect(query));
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstCR;
+        }
 
 		public List<ContaReceber> busca()
 		{
-	return	}
+            query = null;
+            List<ContaReceber> lstCR = new List<ContaReceber>();
+            try
+            {
+                query = "SELECT U.IDENTIFICACAO, CR.DT_CONTA_RECEBER, CR.VALOR FROM CONTA_RECEBER AS CR "
+                        + "INNER JOIN UNIDADE AS U ON U.ID_UNIDADE = CR.ID_UNIDADE "
+                        + "WHERE CR.STS_ATIVO = 1 ORDER BY CR.DT_CONTA_RECEBER DESC;";
+                lstCR = setarObjeto(banco.MetodoSelect(query));
+            }
 
-		public bool remove()
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstCR;
+        }
+
+		public bool remove(int id)
 		{
-	return	}
+            query = null;
+            try
+            {
+                query = "UPDATE CONTA_RECEBER SET STS_ATIVO = 0 WHERE ID_CONTA_RECEBER = " + id.ToString() + ";";
+                banco.MetodoNaoQuery(query);
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                return false;
+                throw ex;
+            }
+        }
         
+        #region DSTV
+
+        //public List<ContaReceber> buscaPorCondominio(Condominio condominio)
+        //{
+        //    query = null;
+        //    List<ContaReceber> lstCR = new List<ContaReceber>();
+        //    try
+        //    {
+        //        query = "SELECT TC.DESCRICAO, F.RAZAO_SOCIAL, CP.VALOR, CP.DT_PAGTO FROM CONTA_PAGAR AS CP "
+        //                + "INNER JOIN TIPO_CONTA AS TC ON CP.ID_TIPO_CONTA = TC.ID_TIPO_CONTA "
+        //                + "INNER JOIN FORNECEDOR AS F ON CP.ID_FORNECEDOR = F.ID_FORNECEDOR "
+        //                + "WHERE  AND CP.STS_ATIVO = 1;";
+        //        lstCR = setarObjeto(banco.MetodoSelect(query));
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //    return lstCR;
+        //}		
+
         #endregion
 
+        #endregion
 
         #region Métodos
 
-        public List<ContaReceber> setarObjeto(ContaReceber dr)
+        public List<ContaReceber> setarObjeto(SqlDataReader dr)
         {
-            ContaPagar obj = new ContaPagar();
+            ContaReceber obj = new ContaReceber();
             List<ContaReceber> lstCR = new List<ContaReceber>();
 
             try
@@ -101,19 +181,16 @@ namespace Model.DAO.Especifico
                 {
                     while (dr.Read())
                     {
-                        obj.id_cp = Convert.ToInt32(dr["ID_CONTA_PAGAR"].ToString());
+                        obj.id_cr = Convert.ToInt32(dr["ID_CONTA_RECEBER"].ToString());
                         obj.valor = Convert.ToDecimal(dr["VALOR"].ToString());
-                        obj.data = Convert.ToDateTime(dr["DT_PAGTO"].ToString());
+                        obj.data = Convert.ToDateTime(dr["DT_CONTA_RECEBER"].ToString());
 
-                        obj.id_tipo = Convert.ToInt32(dr["ID_TIPO_CONTA"].ToString());
-                        obj.desc_conta = Convert.ToString(dr["DESCRICAO"].ToString());
-
-                        obj.fornecedor.id_fornecedor = Convert.ToInt32(dr["ID_FORNECEDOR"].ToString());
-                        obj.fornecedor.nomeEmpresa = Convert.ToString(dr["RAZAO_SOCIAL"].ToString());
+                        obj.unidade.id_unidade = Convert.ToInt32(dr["ID_UNIDADE"].ToString());
+                        obj.unidade.identificacao = Convert.ToString(dr["IDENTIFICACAO"].ToString());
 
                         obj.condominio.id_cond = Convert.ToInt32(dr["ID_COND"].ToString());
 
-                        lstCP.Add(obj);
+                        lstCR.Add(obj);
                     }
                 }
 

@@ -29,9 +29,9 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {       //Os dados nulos serão inseridos posteriormente com a retirada da correspondencia.
-                query = "INSERT INTO CORRESPONDENCIA (DESCRICAO, ID_UNIDADE, DT_ENTRADA, DT_SAIDA, ID_PESSOA, STS_ATIVO, OBS_CANC) VALUES ("
-                    + correspondencia.descCorespondencia + ", " + (correspondencia.destinatario).ToString() + ", "
-                    + (correspondencia.dtEntrada).ToString() + ", NULL, NULL, 1, NULL)";
+                query = "INSERT INTO CORRESPONDENCIA (DESCRICAO, ID_UNIDADE, DT_ENTRADA, DT_SAIDA, ID_PESSOA, STS_ATIVO, OBS_CANC) VALUES ('"
+                    + correspondencia.descCorrespondencia + "', " + (correspondencia.unidade.id_unidade).ToString() + ", '"
+                    + (correspondencia.dtEntrada).ToString() + "', NULL, NULL, 1, NULL);";
                 return true;
             }
 
@@ -42,7 +42,7 @@ namespace Model.DAO.Especifico
             }
         }
 
-		public List<Correspondencia> buscaPorUnidade(string unidade)
+        public List<Correspondencia> buscaPorUnidade(int unidade)
 		{
             query = null;
             List<Correspondencia> lstCorrespondencia = new List<Correspondencia>();
@@ -51,9 +51,9 @@ namespace Model.DAO.Especifico
                 query = "SELECT C.DESCRICAO, U.IDENTIFICACAO, C.DT_ENTRADA, C.DT_SAIDA, P.ID_PESSOA, C.OBS_CANC FROM CORRESPONDENCIA AS C "
                         + " INNER JOIN UNIDADE AS U ON C.ID_UNIDADE = U.ID_UNIDADE "
                         + " LEFT OUTER JOIN PESSOA AS P ON C.ID_PESSOA = P.ID_PESSOA "
-                        + " WHERE C.ID_UNIDADE = " + unidade
-                        + " AND STS_ATIVO = 1";  //VERIFICAR O JOIN
-                lstCorrespondencia.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + " WHERE C.ID_UNIDADE = " + unidade.ToString()
+                        + " AND C.STS_ATIVO = 1;";  //VERIFICAR O JOIN
+                lstCorrespondencia = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -74,8 +74,8 @@ namespace Model.DAO.Especifico
                         + " INNER JOIN UNIDADE AS U ON C.ID_UNIDADE = U.ID_UNIDADE "
                         + " LEFT OUTER JOIN PESSOA AS P ON C.ID_PESSOA = P.ID_PESSOA "
                         + " WHERE C.DT_ENTRADA = " + (dtEntrada).ToShortDateString() + " AND C.DT_SAIDA = " + (dtSaida).ToShortDateString()
-                        + " AND STS_ATIVO = 1";  //VERIFICAR O JOIN
-                lstCorrespondencia.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + " AND C.STS_ATIVO = 1;";  //VERIFICAR O JOIN
+                lstCorrespondencia = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -95,8 +95,8 @@ namespace Model.DAO.Especifico
                 query = "SELECT C.DESCRICAO, U.IDENTIFICACAO, C.DT_ENTRADA, C.DT_SAIDA, P.ID_PESSOA, C.OBS_CANC FROM CORRESPONDENCIA AS C "
                         + " INNER JOIN UNIDADE AS U ON C.ID_UNIDADE = U.ID_UNIDADE "
                         + " LEFT OUTER JOIN PESSOA AS P ON C.ID_PESSOA = P.ID_PESSOA "
-                        + " WHERE STS_ATIVO = 1";  //VERIFICAR O JOIN
-                lstCorrespondencia.Add(setarObjeto(banco.MetodoSelect(query)));
+                        + " WHERE C.STS_ATIVO = 1;";  //VERIFICAR O JOIN
+                lstCorrespondencia = setarObjeto(banco.MetodoSelect(query));
             }
 
             catch (Exception ex)
@@ -105,6 +105,24 @@ namespace Model.DAO.Especifico
             }
 
             return lstCorrespondencia;
+        }
+
+        public bool altera(Correspondencia correspondencia)
+        {
+            query = null;
+            try
+            {
+                query = "UPDATE CORRESPONDENCIA SET DESCRICAO = '" + correspondencia.descCorrespondencia + "' WHERE ID_CORRESPONDENCIA = "
+                        + correspondencia.id_correspondencia.ToString();
+                banco.MetodoNaoQuery(query);
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                return false;
+                throw ex;
+            }
         }
 
 		public bool remove(int id, string obs_canc) //Inclui as observações na exclusão
@@ -145,10 +163,10 @@ namespace Model.DAO.Especifico
 
         #region Métodos
 
-        public Correspondencia setarObjeto(SqlDataReader dr)
+        public List<Correspondencia> setarObjeto(SqlDataReader dr)
         {
             Correspondencia obj = new Correspondencia();
-
+            List<Correspondencia> lstCorresp = new List<Correspondencia>();
             try
             {
                 for (int idx = 0; idx < dr.FieldCount; idx++)
@@ -161,10 +179,10 @@ namespace Model.DAO.Especifico
                             obj.id_correspondencia = Convert.ToInt32(dr[idx]);
                             break;
                         case "DESCRICAO":
-                            obj.descCorespondencia = Convert.ToString(dr[idx]);
+                            obj.descCorrespondencia = Convert.ToString(dr[idx]);
                             break;
                         case "ID_UNIDADE":
-                            obj.destinatario = Convert.ToInt32(dr[idx]);
+                            obj.unidade.id_unidade = Convert.ToInt32(dr[idx]);
                             break;
                         case "DT_ENTRADA":
                             obj.dtEntrada = Convert.ToDateTime(dr[idx]);
@@ -173,10 +191,10 @@ namespace Model.DAO.Especifico
                             obj.dtSaida = Convert.ToDateTime(dr[idx]);
                             break;
                         case "ID_PESSOA":
-                            obj.responsavelRetirada = Convert.ToInt32(dr[idx]);
+                            obj.responsavelRetirada.id_pessoa = Convert.ToInt32(dr[idx]);
                             break;
                         case "OBS_CANC":
-                            obj.obsDeCancelamento = Convert.ToString(dr[idx]);
+                            obj.obsCancelamento = Convert.ToString(dr[idx]);
                             break;
                     }
                 }
@@ -188,7 +206,7 @@ namespace Model.DAO.Especifico
                 throw ex;
             }
 
-            return obj;
+            return lstCorresp;
         }
 
         #endregion

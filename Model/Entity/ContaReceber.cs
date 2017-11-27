@@ -10,7 +10,7 @@ namespace Model.Entity
 
         }
 
-        public ContaReceber(Condominio condominio, float valor, Unidade uni)
+        public ContaReceber(Condominio condominio, decimal valor, Unidade uni)
         {
 
         }
@@ -19,7 +19,7 @@ namespace Model.Entity
 
         public string observacao { set; get; }
 
-        public float valor { get; set; }
+        public decimal valor { get; set; }
 
         public DateTime data { get; set; }
 
