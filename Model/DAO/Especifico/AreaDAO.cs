@@ -31,30 +31,6 @@ namespace Model.DAO.Especifico
                         lstArea.Add(obj);
                     }
                 }
-
-                //for (int idx = 0; idx < dr.FieldCount; idx++)
-                //{
-                    //dr.GetName(idx).ToString();
-
-                    //switch (dr.GetName(idx).ToUpper())
-                    //{
-                    //    case "ID_AREA":
-                    //        obj.id_area = Convert.ToInt32(dr[idx]);
-                    //        break;
-                    //    case "DESCRICAO":
-                    //        obj.descricao = Convert.ToString(dr[idx]);
-                    //        break;
-                    //    case "RESERVA":
-                    //        obj.seAluga = Convert.ToBoolean(dr[idx]);
-                    //        break;
-                    //    case "NOME":
-                    //        obj.nome = Convert.ToString(dr[idx]);
-                    //        break;
-                    //    case "CAPACIDADE_MAX":
-                    //        obj.capacMax = Convert.ToInt32(dr[idx]);
-                    //        break;
-                    //}
-                //}
             }
 
             catch(Exception ex)
@@ -89,9 +65,9 @@ namespace Model.DAO.Especifico
             query = null;
             try
             {
-                query = "INSERT INTO AREA (DESCRICAO, RESERVA, NOME, CAPACIDADE_MAX, STS_ATIVO) VALUES ('"
-                                + area.descricao + "', " + (area.seAluga).ToString() + ", '" + area.nome + "', "
-                                + (area.capacMax).ToString() + ", 1)";
+                query = "INSERT INTO AREA (NOME, DESCRICAO, RESERVA, CAPACIDADE_MAX, STS_ATIVO) VALUES ('"
+                                + area.nome + "', '" + area.descricao + "', " + Convert.ToInt32(area.seAluga) + ", "
+                                + (area.capacMax).ToString() + ", " + Convert.ToInt32(area.ativo) + ");";
                 banco.MetodoNaoQuery(query);
                 return true;
             }
@@ -109,7 +85,7 @@ namespace Model.DAO.Especifico
             List<Area> lstArea = new List<Area>();
             try
             {
-                query = "SELECT NOME, DESCRICAO, CAPACIDADE_MAX, RESERVA FROM AREA WHERE NOME LIKE '%" + nome + "%' AND STS_ATIVO = 1 ORDER BY NOME;";
+                query = "SELECT ID_AREA, NOME, DESCRICAO, CAPACIDADE_MAX, RESERVA FROM AREA WHERE NOME LIKE '%" + nome + "%' AND STS_ATIVO = 1 ORDER BY NOME;";
                 lstArea = setarObjeto(banco.MetodoSelect(query));
             }
 
